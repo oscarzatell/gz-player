@@ -1,0 +1,167 @@
+#reproductor 
+    display: block 
+    path 
+        color: #fff 
+        fill: #fff
+        fill-opacity:1
+        stroke:none
+    .disk
+        width: 300px
+        height: 300px
+        margin: 100px auto 5px auto
+        background: url('/icons/media-random-albums-amarok.svg')
+        border-radius: 50%
+
+    .barra
+        position: absolute 
+        bottom: 0
+        width: 100%
+        .progress
+            animation-timing-function: linear
+            height: 40px 
+            width: 100%
+            background: #222
+            .name 
+
+                color: #fff
+                text-align: center
+
+            .bar
+
+                position: absolute
+                margin-top: 15px 
+                width: 100%            
+                height: 5px
+                background: #fff
+
+                div
+                
+                    display: block
+                    height: 100%
+                    background: linear-gradient(45deg, #3f3, #4476ff)
+                    border-radius: 25px
+                    animation-play-state: paused
+                    
+        .tools
+            overflow: hidden
+            width: 100%
+            height: 60px
+            background: #181c18
+            &.open 
+                height: 120px
+            .basic
+                height: 60px
+                display: flex
+                justify-content: space-between
+                align-items: center
+
+                .options 
+                    display: flex 
+
+                .btn
+
+                    width: 40px 
+                    height: 40px 
+                    margin: 0 20px
+                    cursor: pointer
+                    &:hover
+                        animation: .4s redimention linear 
+
+                    &#heart, &#arrow
+
+                        width: 30px 
+                        height: 30px
+                        margin: 0 4px
+
+                    &#arrow 
+                        transform: rotate(180deg)
+                        animation: none
+                        transition: .6s
+
+                        &:hover, &.open 
+                            transform: rotate(0deg)
+                            transition-delay: 0s
+                        &.open:hover 
+                            transform: rotate(180deg)
+                            transition-delay: 0s
+                        
+                            
+
+                    &#heart
+                        path
+
+                            transition: .2s
+                            color: transparent 
+                            &:hover
+
+                                color: #fff 
+                            &.active 
+
+                                color: #fff
+            .moreOptions
+                    
+                    display: flex
+                    justify-content: space-evenly
+                    margin-top: 20px 
+                    height: 40px
+                    width: 100%
+
+                    .btn
+                
+                        width: 27px
+                        height: 27px
+                        &:hover 
+
+                            animation: redimention .5s linear 
+
+
+.volume 
+
+    position: absolute
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 0
+    height: 33%
+    background: #181c18
+    right: 2px
+    top: 33%
+    border-radius: 9px
+    overflow: hidden
+
+
+    input[type='range'] 
+        //-webkit-appearance: none !important
+        border-radius: 25px
+        background: #719671
+        height: 7px
+        position: absolute
+        width: 27vh
+        transform: rotate(-90deg)
+            
+
+    input[type='range']::-webkit-slider-thumb 
+        -webkit-appearance: none !important
+        border-radius: 50%
+        background: #00ff7f
+        height: 12px
+        width: 12px
+@keyframes rotate
+    0%
+        transform: rotate(0deg)
+    50%
+        transform: rotate(180deg)
+    100%
+        transform: rotate(360deg)
+
+@keyframes progress
+    0%
+        width: 0%
+    100%
+        width: 100%
+
+@keyframes redimention
+    0%
+        transform: scale(1.1)
+    100%
+        transform: scale(1)

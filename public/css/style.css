@@ -1,0 +1,252 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  transition: 0.1s;
+}
+
+body {
+  background: #00ff7f;
+}
+
+header {
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: 0ff7f;
+}
+header .title {
+  font-weight: bolder;
+  font-style: italic;
+  display: flex;
+}
+header .title .logo {
+  background: url(/icons/logo.png);
+  width: 40px;
+  height: 40px;
+}
+header .title span {
+  font-family: monospace;
+  font-size: 25px;
+  margin: 14px 0 0 -10px;
+  color: #222c23;
+}
+header .btn-menu {
+  width: 38px;
+  height: 30px;
+  position: relative;
+}
+header .btn-menu .btn, header .btn-menu .btn::after, header .btn-menu .btn::before {
+  position: absolute;
+  transition: 0.6s;
+  content: "";
+  width: 35px;
+  height: 5px;
+  background: #51aa68;
+}
+header .btn-menu .btn::after {
+  margin-top: 13px;
+}
+header .btn-menu .btn::before {
+  margin-top: 25px;
+}
+header .btn-menu .btn.open {
+  transform: rotate(45deg);
+  margin-top: 12px;
+}
+header .btn-menu .btn.open::after {
+  transform: rotate(0);
+  margin-top: 0;
+}
+header .btn-menu .btn.open::before {
+  margin-top: 0;
+  transform: rotate(90deg);
+}
+
+.menu {
+  transition: 0.5s;
+  position: absolute;
+  top: 0;
+  width: 75%;
+  height: 100vh;
+  display: block;
+  background: #ffffff;
+}
+.menu.close {
+  margin-left: -100%;
+}
+
+#reproductor {
+  display: block;
+}
+#reproductor path {
+  color: #fff;
+  fill: #fff;
+  fill-opacity: 1;
+}
+#reproductor .disk {
+  width: 300px;
+  height: 300px;
+  margin: 100px auto 5px auto;
+  background: url("/icons/media-random-albums-amarok.svg");
+  border-radius: 50%;
+}
+#reproductor .barra {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+#reproductor .barra .progress {
+  animation-timing-function: linear;
+  height: 40px;
+  width: 100%;
+  background: #222;
+}
+#reproductor .barra .progress .name {
+  color: #fff;
+  text-align: center;
+}
+#reproductor .barra .progress .bar {
+  position: absolute;
+  margin-top: 15px;
+  width: 100%;
+  height: 5px;
+  background: #fff;
+}
+#reproductor .barra .progress .bar div {
+  display: block;
+  height: 100%;
+  background: linear-gradient(45deg, #3f3, #4476ff);
+  border-radius: 25px;
+  animation-play-state: paused;
+}
+#reproductor .barra .tools {
+  overflow: hidden;
+  width: 100%;
+  height: 60px;
+  background: #181c18;
+}
+#reproductor .barra .tools.open {
+  height: 120px;
+}
+#reproductor .barra .tools .basic {
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#reproductor .barra .tools .basic .options {
+  display: flex;
+}
+#reproductor .barra .tools .basic .btn {
+  width: 40px;
+  height: 40px;
+  margin: 0 20px;
+  cursor: pointer;
+}
+#reproductor .barra .tools .basic .btn:hover {
+  animation: 0.4s redimention linear;
+}
+#reproductor .barra .tools .basic .btn#heart, #reproductor .barra .tools .basic .btn#arrow {
+  width: 30px;
+  height: 30px;
+  margin: 0 4px;
+}
+#reproductor .barra .tools .basic .btn#arrow {
+  transform: rotate(180deg);
+  animation: none;
+  transition: 0.6s;
+}
+#reproductor .barra .tools .basic .btn#arrow:hover, #reproductor .barra .tools .basic .btn#arrow.open {
+  transform: rotate(0deg);
+  transition-delay: 0s;
+}
+#reproductor .barra .tools .basic .btn#arrow.open:hover {
+  transform: rotate(180deg);
+  transition-delay: 0s;
+}
+#reproductor .barra .tools .basic .btn#heart path {
+  transition: 0.2s;
+  color: transparent;
+}
+#reproductor .barra .tools .basic .btn#heart path:hover {
+  color: #fff;
+}
+#reproductor .barra .tools .basic .btn#heart path.active {
+  color: #fff;
+}
+#reproductor .barra .tools .moreOptions {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+  height: 40px;
+  width: 100%;
+}
+#reproductor .barra .tools .moreOptions .btn {
+  width: 27px;
+  height: 27px;
+}
+#reproductor .barra .tools .moreOptions .btn:hover {
+  animation: redimention 0.5s linear;
+}
+
+.volume {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 0;
+  height: 33%;
+  background: #181c18;
+  right: 2px;
+  top: 33%;
+  border-radius: 9px;
+  overflow: hidden;
+}
+.volume input[type=range] {
+  border-radius: 25px;
+  background: #719671;
+  height: 7px;
+  position: absolute;
+  width: 27vh;
+  transform: rotate(-90deg);
+}
+.volume input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  border-radius: 50%;
+  background: #00ff7f;
+  height: 12px;
+  width: 12px;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+@keyframes redimention {
+  0% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/*# sourceMappingURL=style.css.map */
