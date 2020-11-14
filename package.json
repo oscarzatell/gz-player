@@ -18,9 +18,10 @@
   },
   "homepage": "https://github.com/oscarzatell/gz-player#readme",
   "dependencies": {
+    "colors": "^1.4.0",
     "express": "^4.17.1",
-    "pug": "^3.0.0",
     "express-form-data": "^2.0.13",
-    "mongoose": "^2.0.40"
+    "mongoose": "^2.0.40",
+    "pug": "^3.0.0"
   }
 }

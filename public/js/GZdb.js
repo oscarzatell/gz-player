@@ -1,36 +1,83 @@
+
 class GZdb{
-    constructor
-        (
-            name, version,
-            colection, Schemas,
-            keyAndIncrement = {
-                keyPath: "id",
-                autoIncrement: true
-            }
-        ){
+
+    constructor( name, version ){
 
         this.name = name 
         this.version = version 
-        this.Schemas = Schemas
-        this.colection = colection
+        this.Schemas = []
+
         this.db = (def)=>{
+
+//          Creacion de los almacenes de objetos con los esquemas pasados
             const 
                 dbconnect = window.indexedDB.open(name, version)
-                
+
             dbconnect.onupgradeneeded = e => {
-                const
-                    db = e.target.result,
-                    store = db.createObjectStore(this.colection, keyAndIncrement)
-                    
-                    this.Schemas.forEach(e => {
+                
+                const db = e.target.result
+
+                this.Schemas.forEach(schema => {
+                    console.log(schema)
+                    let store = db.createObjectStore(schema[0], schema[2])    
+                    schema[1].forEach(e => {
+                        console.log(e)
                         store.createIndex(e.index, e.index, e.condition)
                     })
+                })
             }
             
-          
+//      Devolucion de la coneccion para uso de la DB
             dbconnect.onsuccess = e => def(e.target.result)
 
         }
+
+    }
+
+    setSchema
+    (
+        name, 
+        schema, 
+        keyAndIncrement = {
+            keyPath: "id",
+            autoIncrement: true
+        }
+    ){
+        const 
+            Schema = [name, []],
+            keys = Object.keys(schema)
+
+        keys.forEach(key => {
+
+//          Guardo la llave como indice y el valor como condicion
+            if(typeof schema[key] == "object"){
+
+                Schema[1].push
+                (
+                    {
+                        index: key,
+                        condition: schema[key]
+                    }
+                )
+
+//          Solo guardo la llave 
+            }else { 
+
+                Schema[1].push({index: key})
+            }
+
+/*            
+                El modelo final es el siguiente 
+                ["nombre", {
+                    index: key,
+                    condition?: ValorOfKey
+                },? {keyPath: "", autoIncrement: true}]
+            
+*/            
+        })
+        Schema.push(keyAndIncrement)
+        //Agrego este esquema a los esquemas 
+        this.Schemas.push(Schema)
     }
 
     get(colection, id,def){
@@ -91,17 +138,34 @@ class GZdb{
     }
     set(colection, datos, def){
         this.db(e => {
+
             const transaction = e.transaction(colection, 'readwrite')
             const store = transaction.objectStore(colection)
-            datos.forEach(d => store.add(d))
+            if(Array.isArray(datos)){
+
+                datos.forEach(data => store.add(data))
+            }else{
+                store.add(datos)
+            }
             transaction.onerror = err => def(`error:${err}`)
             transaction.oncomplete = e => def("done", e)
         })
     }
+
 }
 
-const db = new GZdb("Mibasededatos", 1, "Usuari", [
-    {index: "Nickname", condition:{unique: false}},
-    {index: "email", condition: {unique: true}}
-])
+
+const db = new GZdb("Mibasededatos", 1)
+
+db.setSchema("users", {
+    name: "",
+    apellido: "",
+    telefono: {unique: true}
+})
+
+db.set("users", {
+    name: "Jhon",
+    apellido: "Guerrero",
+    telefono: 3006357498
+})
 
