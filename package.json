@@ -20,8 +20,8 @@
   "dependencies": {
     "colors": "^1.4.0",
     "express": "^4.17.1",
-    "express-form-data": "^2.0.13",
-    "mongoose": "^2.0.40",
+    "express-form-data": "^2.0.14",
+    "mongoose": "^5.10.14",
     "pug": "^3.0.0"
   }
 }

@@ -2,219 +2,321 @@ const
     id = ID => document.getElementById(ID),
     Query = Q => document.querySelector(Q),
     QueryAll = Q => document.querySelectorAll(Q),
-    ToB64 = new FileReader()
+    Store = window.localStorage,
+    fileRader = new FileReader()
 
 let 
-    NumberSong = 0
+    NumberSong = 0,
+    canciones = [], 
+    audio = undefined
 
-class Menu{
-    constructor(btn, menu){
-        this.menu = menu
-        this.btn = btn
-   
+
+//Quita caracteres, extencion y acorta a 24 caracteres agregando ... al final
+    const JustText = text => {
+    
+        return text.split(".mp3")[0].replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, ' ').substr(0, 24) + "..."
     }
 
-    open(btnClass, menuClass){
-        this.btn.classList.toggle(btnClass)
-        this.menu.classList.toggle(menuClass)
+//Abrrir y cierra un menú
+    class Menu{
+        constructor(menu, btn, toggleClassMenu, toggleClassBtn){
+            this.menu = menu 
+            this.btn = btn 
+            this.btnClass = toggleClassBtn
+            this.menuClass = toggleClassMenu
+        }
+
+        change(){
+            let
+                btn = this.btn.classList.toggle(this.btnClass),
+                menu = this.menu.classList.toggle(this.menuClass)  
+            return {btn, menu}  
+        }
+    } 
+
+//Convertir array buser a base65
+    const ArrayToB64 = (buffer, type) =>{
+        let
+            binary = '',
+            bytes = new Uint8Array(buffer),
+            len = bytes.byteLength
+
+        for (var i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i])
+        }
+        let b64 = type +  window.btoa(binary)
+        return b64
     }
-}
 
-const menu = new Menu(id('btn'), Query('nav.menu'))
-
-Query('.btn-menu').addEventListener('click', ()=>{
-    menu.open('open', 'close')
-})
-
-document.addEventListener('keypress', e => {
-    if(e.key == 'M'){
-        menu.open('open', 'close')
-    }
-})
-
-
-let audios;
-let audio; 
 
 class Reproductor{
 
     constructor(audios,tagAudio){
+
         this.audios = audios 
         this.tagAudio = tagAudio
-        this.names = ()=>{
-            let names = []
-            for(audio of audios){
-                names = names.concat(audio.name.replaceAll('_' || '-', ' '))
-            }
-            return names
-        }
-        this.folder =  audios[0].webkitRelativePath.split('/')[0]
     }
-    PlayPause(){
+    
+    PlayPause(btn){
 
-        if(id('audio').paused)
-        
+        const playPause = ()=> {
+            if(id('audio').paused)
             id('audio').play(),
             Query('.progress .bar div').style.animationPlayState = 'running',
             Query('.pause-btn').style.color = '#bfbfbf',
             QueryAll('.pause-btn')[1].style.color = '#bfbfbf',
             Query('.play-btn').style.color = 'transparent'
-        else 
-    
+            else 
+            
             id('audio').pause(),
             Query('.progress .bar div').style.animationPlayState = 'paused',
             Query('.play-btn').style.color = '#bfbfbf',
             Query('.pause-btn').style.color = 'transparent',
             QueryAll('.pause-btn')[1].style.color = 'transparent'
-    }
-    Reset(){
-        this.tagAudio.currentTime = 0
-        init()
-    }
-    Next(){
-
-        if(NumberSong > audios.length -1){
-            NumberSong = 0
-        }else{
-            NumberSong++
         }
-
-        init()
+        if(btn)
+            btn.addEventListener("click", playPause)
+        else 
+            playPause()
     }
-    Before(){
+        
+    CargarAudio(play){
 
-        if(this.tagAudio.currentTime > 10){
-            this.Reset()
-            return
+        fileRader.readAsDataURL(canciones[NumberSong].song)
+        fileRader.onload = () => {
+            Store.setItem("NumberSong", NumberSong)
+            id("audio").src = fileRader.result
+            audio = fileRader
+            Query('.progress .name').innerHTML = canciones[NumberSong].title
+            if(play){
+                this.PlayPause()
+            }
         }
-        if(NumberSong <= 0){
-            NumberSong = audios.length -1
-        }else{
-            NumberSong--
+    }
+    Reset(btn){
+        btn.addEventListener("click", ()=>{
+
+            this.tagAudio.currentTime = 0
+        })
+    }
+    Next(btn){
+
+        const next = ()=>{
+            if(NumberSong > canciones.length -1){
+                NumberSong = 0
+            }else{
+                NumberSong++
+            }
+            this.CargarAudio(true)
         }
-        init()
+        if(btn)
+            btn.addEventListener("click", ()=>next())
+        else 
+            next()
+    }
+    Before(btn){
+        btn.addEventListener("click", ()=> {
+
+            if(this.tagAudio.currentTime > 10){
+                this.Reset()
+                return
+            }
+            if(NumberSong <= 0){
+                NumberSong = canciones.length -1
+            }else{
+                NumberSong--
+            }
+            this.CargarAudio(true)
+
+        })
+    }
+
+    Volume(btn, InputRange){
+        let interval;
+
+        //Coloco el valor del range en el volumen actual
+        InputRange.value = id('audio').volume
+
+        //Se despliega el menu al hacer click en el boton
+        btn.addEventListener("click", e => {
+
+        //En 5s se vuelve a ocultar 
+            Query('.volume').style.width = "40px"
+            interval = setTimeout(() => {
+                Query('.volume').style.width = "0"
+            }, 5000);
+        })
+
+        //Se detiene el intervalo para que no se oculte
+        Query('.volume').onmousedown = () => clearInterval(interval) 
+        
+        //Se vuelve a activar el intervalo para esconderse en 5s
+        Query('.volume').onmouseup = () => {
+
+            //Se oculta en 5s
+            interval = setTimeout(() => {
+                Query('.volume').style.width = "0"
+            }, 5000);
+            
+        }
+        //Se modifica el volumen al pasar el mause por el input
+        InputRange.onmousemove = e => {
+            Store.setItem("volumen", e.target.value)
+            this.tagAudio.volume = parseFloat(e.target.value)
+        }
     }
 }
 
+const reproductor = new Reproductor(canciones, id("audio"))
 
-let reproductor;
+reproductor.PlayPause(id('play-btn'))
+reproductor.Next(id('next-btn'))
+reproductor.Before(id('before-btn'))
+reproductor.Volume(id("volIcon"), Query('.volume input'))
+id("audio").onended = () =>reproductor.Next()
 
-const init = ()=>{
-    ToB64.readAsDataURL(audios[NumberSong])
-    ToB64.onload = () => {
-     
-        Query('.progress .name').innerHTML = reproductor.names()[NumberSong].split('.')[0].split('(')[0]
-        id('audio').src = ToB64.result
-        reproductor.PlayPause()
-        id('audio').play()
-    }
-}
+//barra de progreso
+id('audio').onprogress = e => {
 
-id('audio').onplay = e => {
-    if(id('audio').currentTime <= 0){
+    Query('.progress .bar div').setAttribute('style', `
+        transition: .5s;
+        animation-name: ;
+        width:0%
+    `)   
+    id('audio').onplay = e => {
 
-        Query('.progress .bar div').setAttribute('style', `
-            transition: .5s;
-            animation-name: ;
-            width:0%
-        `)   
         setTimeout(() => {
-
+            
+            console.log((e.target.duration - e.target.currentTime )/60)
             Query('.progress .bar div').setAttribute('style', `
-            animation-duration: ${e.target.duration}s;
-            animation-play-state: running;
-            animation-name: progress
-        `)                
-        }, 50);
+                animation-duration: ${e.target.duration - 0.600}s;
+                animation-play-state: running;
+                animation-name: progress
+            `)                
+        }, 600);
     }
 }  
 
-Query('input').onchange = () => {
+const Canciones = new GZdb("Canciones", 1)
 
-    audios = Query('input').files
-    reproductor = new Reproductor(audios, id('audio'))
-    init()
-}
+Canciones.setSchema("Canciones", {
+    song: ""
+}, {
+    keyPath: undefined,
+    autoIncrement: true
+})
 
 
-id('play-btn').onclick = ()=>{
-    reproductor.PlayPause()
-}
+Canciones.getAll("Canciones")
+.then( async songs => {
+     if(!songs["404"]){
+         canciones = await canciones.concat(songs)
+         reproductor.CargarAudio()
+     }
+})
 
-id('next-btn').onclick = ()=>{
-    reproductor.Next()
-}
 
-id('before-btn').onclick = ()=>{
-    reproductor.Before()
-}
-id('audio').onended = ()=>{
+//Actualizo el numbero de la cancion al ultimo estado que tuvo
+    NumberSong = parseInt(Store.getItem("NumberSong")) != undefined ?
+    Store.getItem("NumberSong") : 0
 
-    reproductor.Next()
-}
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-            .then(reg => {
-                console.log('Registration succeeded. Scope is ' + reg.scope);
-            })
-            .catch(registrationError => {
-                console.log('SW registration failed: ', registrationError);
-            });
-    });
-}
+//Coloco el volumen en el ultimo valor guardado
+    id("audio").volume = Store.getItem("volumen") != undefined ?
+    Store.getItem("volumen") :  1
+    Query(".volume input").value = Store.getItem("volumen") != undefined ?
+    Store.getItem("volumen") :  1 
 
-if(!window.clientInformation.platform.toLowerCase().includes('x86_64')){
+//Estraer todos los datos de una cancion
+const Tags = (file) => new Promise(resolve => {
 
-}else if(!window.clientInformation.platform.toLowerCase().includes('windows')){
+    jsmediatags.read(file, {
 
-}else{
-    id('input').removeAttribute('directory')
-    id('input').removeAttribute('webkitdirectory')
-    console.log('bye')
-}
-Query('.volume input').value = id('audio').volume
-let interval;
-id("volIcon").onclick = e => {
-    Query('.volume').style.width = "40px"
-    interval = setTimeout(() => {
+        onSuccess:tag=>{
+            tag=tag.tags
 
-        Query('.volume').style.width = "0"
-    }, 5000);
-}
+            let Tags = {}
+            Tags["img"] = tag.picture ?
+                ArrayToB64(tag.picture.data, "data:" +tag.picture.format + ";base64,") :
+                "default.jpg"
+            Tags["album"] = tag.album ? tag.album : "Desconocido"
+            Tags["artista"] = tag.artist ? tag.artist : "Desconocido"
+            Tags["year"] = tag.year ? tag.year : " "
+            Tags["trak"] = tag.track? tag.tack : "0"
+            Tags["title"] = tag.title? tag.title : tag.name
+            resolve(Tags)
+        }
+    })
+})
 
-Query('.volume').onmousedown = () => {
+//Cuando se cargan nuevos archivos se extraen los mp3
+//se agrega un title sin la extencion ni simbolos y se agrega a la lista de canciones
+    id("input").addEventListener("change", async() => {
+        let 
+            archivos = id("input").files,
+            mp3 = Array.from(archivos).filter(i => i.name.includes(".mp3")),
+            audios = []
 
-    clearInterval(interval)
-    
-}
+        mp3.forEach(async (i, j, a) => {
 
-Query('.volume').onmouseup = () => {
+            let 
+                tags = await Tags(i),
+                song ={ song: i}
 
-    interval = setTimeout(() => {
+            for(let e in tags){
+                song[e]=tags[e]
+            }
 
-        Query('.volume').style.width = "0"
-    }, 5000);
-    
-}
+            audios.push(song)
 
-Query('.volume input').onmousemove = e => {
 
-    console.log(parseFloat(e.target.value))
-    id('audio').volume = parseFloat(e.target.value)
-}
+            if(j >= a.length - 1){
+                
+                let result = await compareArrayJson(audios, canciones)
 
-id('arrow').onclick = _ => {
-    id('arrow').classList.toggle('open')
-    id('tools').classList.toggle('open')
-}
+                Canciones.set("Canciones", result)
+                .then(console.log)
+                console.log(result)
+                canciones = canciones.concat(result)
+                if(audio =! undefined){
+                    reproductor.CargarAudio()
+                }
+            }
+        })
+    })
 
-id('list').onclick = _ => {
-    Query('#screen .disk').style.display = 'none'
-    Query('#screen #playlist').innerHTML = reproductor.names()
-}
+//Objetos para abrir y cerrar el menus
+    const
 
-// document.onclick = () => {
-    
-//     showDirectoryPicker().then(e => a = e)
-// }
+        menuLeft = new Menu(
+            id("btnMenuLeft"), 
+            id("menuLeft"), 
+            "open", "close"
+        ),
+
+        menuBottom = new Menu(
+            id("btnMenuBottom"),
+            id("tools"),
+            "open","open"
+        )
+
+//Abrir/cerrar menus
+    id("btnMenuBottom").addEventListener(
+        "click", () => 
+            Store.setItem("menuBottom", menuBottom.change().menu)
+    )
+
+    id("btnMenuLeft").addEventListener(
+        "click", ()=> menuLeft.change()
+    )
+
+    document.addEventListener("keypress", e => {
+        if(e.key == 'M'){
+            menuLeft.change()
+        }
+    })
+
+//Colocar menu inferior en el ultimo estado que tuvo
+    if(Store.getItem("menuBottom") == "true"){
+        menuBottom.change()
+    }
+
