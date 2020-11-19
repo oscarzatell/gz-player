@@ -1,0 +1,20 @@
+@use "./player-tools/Theme" as *
+#progressBar 
+        height: 10px
+        width: 100%
+        background: $progressBarBackground
+        display: flex 
+        .bar 
+            width: 1px
+            height: 100%
+            background: $progressBarColor
+        .circle 
+            transition: .6s
+            display: flex
+            width: 3px 
+            height: 10px 
+            margin-left: -3px
+            background: transparent  
+
+        &:hover .circle
+            background: #fff

@@ -1,4 +1,4 @@
-
+@use "./player-tools/Theme" as *
 header
     padding: 4px
     display: flex
@@ -19,7 +19,7 @@ header
             font-family: monospace
             font-size: 25px
             margin: 14px 0 0 -10px
-            color: #222c23
+            color: $headerTitleColor
 
     .btn-menu 
         width: 38px
@@ -32,7 +32,7 @@ header
             content: ""
             width: 35px
             height: 5px
-            background: #51aa68
+            background: $btnMenuColor
 
         .btn::after 
             margin-top: 13px

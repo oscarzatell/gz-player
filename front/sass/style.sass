@@ -1,3 +1,4 @@
+@use "./components/player-tools/Theme" as *
 *
     margin: 0
     padding: 0
@@ -5,7 +6,8 @@
     outline: none
     transition: .1s
 body
-    background: #00ff7f
+    background: $bodyBackground
 @import ./components/header
 @import ./components/menu
 @import ./components/reproductor
+@import ./components/progressBar

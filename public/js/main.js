@@ -34,7 +34,7 @@ let
         }
     } 
 
-//Convertir array buser a base65
+//Convertir array bufer a base65
     const ArrayToB64 = (buffer, type) =>{
         let
             binary = '',
@@ -62,14 +62,14 @@ class Reproductor{
         const playPause = ()=> {
             if(id('audio').paused)
             id('audio').play(),
-            Query('.progress .bar div').style.animationPlayState = 'running',
+            //Query('.progress .bar div').style.animationPlayState = 'running',
             Query('.pause-btn').style.color = '#fff',
             QueryAll('.pause-btn')[1].style.color = '#fff',
             Query('.play-btn').style.color = 'transparent'
             else 
             
             id('audio').pause(),
-            Query('.progress .bar div').style.animationPlayState = 'paused',
+            //Query('.progress .bar div').style.animationPlayState = 'paused',
             Query('.play-btn').style.color = '#fff',
             Query('.pause-btn').style.color = 'transparent',
             QueryAll('.pause-btn')[1].style.color = 'transparent'
@@ -82,12 +82,16 @@ class Reproductor{
         
     CargarAudio(play){
 
-        fileRader.readAsDataURL(canciones[NumberSong].song)
+        let cancion = canciones[NumberSong]
+        fileRader.readAsDataURL(cancion.song)
         fileRader.onload = () => {
             Store.setItem("NumberSong", NumberSong)
             id("audio").src = fileRader.result
             audio = fileRader
-            Query('.progress .name').innerHTML = canciones[NumberSong].title
+            Query("#title span").innerHTML = cancion.title
+            id("imgSong").src = cancion.img
+            id("artist").textContent = cancion.artista
+            id("album").textContent = cancion.album 
             if(play){
                 this.PlayPause()
             }
@@ -171,31 +175,29 @@ const reproductor = new Reproductor(canciones, id("audio"))
 
 reproductor.PlayPause(id('play-btn'))
 reproductor.Next(id('next-btn'))
-reproductor.Before(id('before-btn'))
-reproductor.Volume(id("volIcon"), Query('.volume input'))
+reproductor.Before(id('back-btn'))
+//reproductor.Volume(id("volIcon"), Query('.volume input'))
 id("audio").onended = () =>reproductor.Next()
 
-//barra de progreso
-id('audio').onprogress = e => {
+// Barra de progreso
+    const bar = def => {
 
-    Query('.progress .bar div').setAttribute('style', `
-        transition: .5s;
-        animation-name: ;
-        width:0%
-    `)   
-    id('audio').onplay = e => {
+        id('progressBar').onclick = e => {
 
-        setTimeout(() => {
-            
-            console.log((e.target.duration - e.target.currentTime )/60)
-            Query('.progress .bar div').setAttribute('style', `
-                animation-duration: ${e.target.duration - 0.600}s;
-                animation-play-state: running;
-                animation-name: progress
-            `)                
-        }, 600);
+            e.target.onmousemove = null
+            e.target.value =  ((e.x -  e.target.offsetLeft) / id("progressBar").clientWidth )* 100
+            def(e.target.value)
+        }
+        
     }
-}  
+
+    bar(e => id("audio").currentTime =  e * id("audio").duration / 100)
+
+    id('audio').onprogress = e => {
+        setInterval(() => {
+            id("circle").style.width = (id("audio").currentTime / id("audio").duration * 100) % id("progressBar").clientWidth + "%"
+        }, 10);
+    }  
 
 const Canciones = new GZdb("Canciones", 1)
 
@@ -217,7 +219,7 @@ Canciones.getAll("Canciones")
 
 
 //Actualizo el numbero de la cancion al ultimo estado que tuvo
-    NumberSong = parseInt(Store.getItem("NumberSong")) != undefined ?
+    NumberSong = parseInt(typeof Store.getItem("NumberSong")) == "number" ?
     Store.getItem("NumberSong") : 0
 
 //Coloco el volumen en el ultimo valor guardado
@@ -300,10 +302,10 @@ const Tags = (file) => new Promise(resolve => {
         )
 
 //Abrir/cerrar menus
-    id("btnMenuBottom").addEventListener(
-        "click", () => 
-            Store.setItem("menuBottom", menuBottom.change().menu)
-    )
+    // id("btnMenuBottom").addEventListener(
+    //     "click", () => 
+    //         Store.setItem("menuBottom", menuBottom.change().menu)
+    // )
 
     id("btnMenuLeft").addEventListener(
         "click", ()=> menuLeft.change()
