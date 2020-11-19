@@ -149,7 +149,7 @@ header .btn-menu .btn.open::before {
 #reproductor .barra .tools .basic .btn:hover {
   animation: 0.4s redimention linear;
 }
-#reproductor .barra .tools .basic .btn#heart, #reproductor .barra .tools .basic .btn#arrow {
+#reproductor .barra .tools .basic .btn#heart, #reproductor .barra .tools .basic .btn#btnMenuBottom {
   width: 30px;
   height: 30px;
   margin: 0 4px;

@@ -25,12 +25,12 @@ app.use('/', router)
 const Go = async()=>{
     
     try{
-        await mongoose.connect('mongodb://localhost/users', {
-            useNewUrlParser   : true,
-            useUnifiedTopology: true,
-            useCreateIndex    : true,
-            useFindAndModify  : false
-        })
+        // await mongoose.connect('mongodb://localhost/users', {
+        //     useNewUrlParser   : true,
+        //     useUnifiedTopology: true,
+        //     useCreateIndex    : true,
+        //     useFindAndModify  : false
+        // })
         await app.listen(PORT)
 
         console.log(`   

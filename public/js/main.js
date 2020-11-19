@@ -63,14 +63,14 @@ class Reproductor{
             if(id('audio').paused)
             id('audio').play(),
             Query('.progress .bar div').style.animationPlayState = 'running',
-            Query('.pause-btn').style.color = '#bfbfbf',
-            QueryAll('.pause-btn')[1].style.color = '#bfbfbf',
+            Query('.pause-btn').style.color = '#fff',
+            QueryAll('.pause-btn')[1].style.color = '#fff',
             Query('.play-btn').style.color = 'transparent'
             else 
             
             id('audio').pause(),
             Query('.progress .bar div').style.animationPlayState = 'paused',
-            Query('.play-btn').style.color = '#bfbfbf',
+            Query('.play-btn').style.color = '#fff',
             Query('.pause-btn').style.color = 'transparent',
             QueryAll('.pause-btn')[1].style.color = 'transparent'
         }

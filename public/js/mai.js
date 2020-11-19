@@ -125,23 +125,7 @@ a1 = {
     amor: "xd"
 }
 
-const compareArrayJson = (nuevo, viejo)=>{
-    const newArr = []
-    nuevo.forEach(e => {
-        let existe = false
-        viejo.forEach((i,j,a) =>{
-            if(e.folder == i.folder && e.name == i.name){
-                existe = true
-            }
-            if(j == a.length -1){
-                if(!existe){
-                    newArr.push(e)
-                }
-            }
-        })
-    })
-    return newArr
-}
+
 
     for(let a in nuevo){
         for(let b in primero){
@@ -167,7 +151,6 @@ const compareArrayJson = (nuevo, viejo)=>{
             }
         }
     }
-}
 
 
 Query('input').onchange = () => {
